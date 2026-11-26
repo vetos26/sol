@@ -28,8 +28,9 @@ jobs:
         run: |
           set -o pipefail
           if ! buildozer android debug 2>&1 | tee build.log; then
-            echo 'Build failed; last lines of the log:'
-            tail -n 40 build.log | while IFS= read -r line; do
+            echo 'Build failed; relevant errors:'
+            grep -iE 'error:|fatal error|exception|traceback|command failed|not found|failed to' build.log | tail -n 20 | while IFS= read -r line; do
+              line=$(printf '%s' "$line" | sed $'s/\\x1b\\[[0-9;]*m//g')
               line=${line//'%'/'%25'}
               echo "::error::$line"
             done
